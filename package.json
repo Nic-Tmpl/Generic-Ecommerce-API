@@ -1,0 +1,14 @@
+{
+  "name": "ecommerce-api-project",
+  "version": "1.0.0",
+  "description": "Backend for an e-commerce application",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Nic-Tmpl",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
