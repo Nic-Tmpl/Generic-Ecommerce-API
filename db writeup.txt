@@ -1,0 +1,50 @@
+Tables:
+
+User:
+ID (pk)
+password
+email
+firstname
+lastname
+created
+modified
+
+Order:
+ORDER ID (PK)
+user_ID (FK references user.ID)
+status
+total (will have be result of an operation, combining orderitem.quantity and product.price)
+created
+modified - to log delete ops
+
+OrderItem:
+Product_Id (FK references product.id)
+order_id (FK references order.id)
+quantity
+
+
+Product:
+id (PK)
+name
+description
+category (fk references categories.id)
+price
+
+Categories
+id [pk]
+name
+
+Cart:
+ID (PK)
+User_id (FK references user.id)
+total (result of an operation between cartitem.quantity and product.price)
+created
+modified (to log delete ops)
+
+CartItem
+cartItem ID (PK)
+cartID (FK references cart.id)
+productID (FK references product.id)
+quantity
+
+
