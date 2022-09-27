@@ -1,0 +1,5 @@
+users.js - allows CRUD ops on /user data
+products.js - allows .get on products, queries for categories, queries for product id
+cart.js - allows CRUD ('add to cart' type function adds product to cart table, a cart can be viewed at a user/cart type page, items can be removed from cart.
+
+order.js - handles orders and order history - 'make order' should put cart into order table at top of history, cart is then cleared (this is a call to the cart clear function from cart routes).

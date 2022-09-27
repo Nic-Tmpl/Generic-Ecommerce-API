@@ -4,6 +4,10 @@ const  app = express();
 
 const PORT = process.env.PORT || 4001;
 
+app.get('/', (req, res) => {
+    res.send("Work in Progress!");
+});
+
 app.listen(PORT, () => {
     console.log(`app is listening on port ${PORT}`);
 });
