@@ -20,6 +20,6 @@ router.get('/:id', async(req, res) => {
 router.get('/categories/:category', async(req, res) => {
     const { category } = req.params;
     const { rows } = await db.query(
-        'SELECT name FROM categories WHERE id = $1 UNION SELECT name FROM products WHERE category =  $1', [category]);
+        'SELECT name FROM categories WHERE id = $1 UNION SELECT name FROM products WHERE category = $1', [category]);
     res.send(rows[0]);
 });
