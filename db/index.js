@@ -1,13 +1,14 @@
-import dotenv from "dotenv";
+const { Pool } = require('pg');
+const { DB } = require('../config');
 
-dotenv.config();
-
-const { Pool } =require('pg')
-
-const pool = new Pool()
+const pool = new Pool({
+    user: DB.PGUSER,
+    host: DB.PGHOST,
+    database: DB.PGDATABASE,
+    password: DB.PGPASSWORD,
+    port: DB.PGPORT,
+})
 
 module.exports = {
-    query: (text, params, callback) => {
-        return pool.query(text, params, callback)
-    },
+    query: (text, params) => pool.query(text, params),
 }
