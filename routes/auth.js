@@ -62,7 +62,7 @@ router.post('/signup', (req ,res, next) => {
     const salt = crypto.randomBytes(16);
     crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256', (err, hashedPassword) => {
         if (err) { return next(err); }
-        db.run('INSERT INTO users (username, password, salt) VALUES $1, $2, $3',
+        db.query('INSERT INTO users (username, password, salt) VALUES $1, $2, $3',
         [req.body.username, hashedPassword, salt], (err) => {
             if (err) { return next(err); }
             const user = {
