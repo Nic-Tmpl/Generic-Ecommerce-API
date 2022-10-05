@@ -23,18 +23,14 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async(req, res) => {
-    const { user_id } = req.params;
-    const time = new Date(); //need to figure out timestamping
-    const { rows } = await db.query(`INSERT INTO cart (id, user_id, created) VALUES ($1, $2, $3)`, [user_id, user_id, time])//fix
+    const { user } = req.body.user;
+    console.log(user);
+    const id = user;
+    const time = new Date().toISOString(); //need to figure out timestamping
+    const { rows } = await db.query(`INSERT INTO cart (id, user_id, created) VALUES ($1, $2, $3)`, [id, user, time]);
     res.status(200);
-});
-
-router.get('/item/:id', async(req, res) => {
-    const { id } = req.params;
-    const { rows } = await db.query(`SELECT c_i.*, p.name FROM "cart_item" c JOIN "products" p
-        ON c_i.product_id = p.id WHERE c_i.product_id = $1`, [id]);
-    res.send(rows[0]);
-});
+    res.send(rows);
+});                                                    
 
 router.delete('/:id', async(req, res) => {
     const { id } = req.params;

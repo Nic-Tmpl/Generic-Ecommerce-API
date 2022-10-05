@@ -4,8 +4,8 @@ const LocalStrategy = require('passport-local');
 const crypto = require('crypto');
 const db = require('../db');
 
-passport.use(new LocalStrategy((username, password, cb) => {
-   db.query('SELECT * FROM users WHERE username = $1', [username], (err, row) => {
+passport.use(new LocalStrategy((email, password, cb) => {
+   db.query('SELECT * FROM users WHERE email = $1', [email], (err, row) => {
         if (err) {return cb(err); }
         if (!row) {return cb(null, false, { message: 'Incorrect username or password.'}); }
 

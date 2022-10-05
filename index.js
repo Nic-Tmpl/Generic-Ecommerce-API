@@ -15,6 +15,10 @@ const store = new pgSession({
     pool: db,
 });
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
 app.use(session({
     store: store,
     secret: 'placeholder',
