@@ -28,10 +28,18 @@ router.post('/', async(req, res) => {
     const { rows } = await db.query(`INSERT INTO cart (user_id, created) VALUES ($1, $2)`, [user, time]);
     res.status(200);
     res.send(rows);
-});                                                    
+});
+
+router.delete('/', async(req, res) => {
+    const user = req.body.user;
+    const { rows } = await db.query(`DELETE FROM cart WHERE user_id = $1`, [user]);
+    res.status(200);
+    res.send('Cart Removed.');
+});
+
 
 router.delete('/:id', async(req, res) => {
     const { id } = req.params;
-    const { rows } = await db.query('DROP * FROM cart_item WHERE product_id = $1', [id]);
+    const { rows } = await db.query('DELETE FROM cart_item WHERE product_id = $1', [id]);
     res.render('/');
 });
