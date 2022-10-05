@@ -23,11 +23,9 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async(req, res) => {
-    const { user } = req.body.user;
-    console.log(user);
-    const id = user;
-    const time = new Date().toISOString(); //need to figure out timestamping
-    const { rows } = await db.query(`INSERT INTO cart (id, user_id, created) VALUES ($1, $2, $3)`, [id, user, time]);
+    const user = req.body.user;
+    const time = new Date().toISOString();
+    const { rows } = await db.query(`INSERT INTO cart (user_id, created) VALUES ($1, $2)`, [user, time]);
     res.status(200);
     res.send(rows);
 });                                                    

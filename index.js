@@ -9,9 +9,9 @@ const { PORT } = require('./config');
 const mountRoutes = require('./routes/index');
 
 const  app = express();
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 
 //psql session store
 const store = new pgSession({
