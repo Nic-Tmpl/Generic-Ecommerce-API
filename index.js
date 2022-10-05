@@ -3,21 +3,20 @@ const express = require('express');
 const passport = require('passport');
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
+const cors = require('cors');
 const db = require('./db');
 const { PORT } = require('./config');
 const mountRoutes = require('./routes/index');
 
 const  app = express();
-mountRoutes(app);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 //psql session store
 const store = new pgSession({
     pool: db,
 });
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 
 app.use(session({
     store: store,
@@ -28,6 +27,11 @@ app.use(session({
 }));
 
 app.use(passport.authenticate('session'));
+
+//brings in routers
+mountRoutes(app);
+
+
 
 app.listen(PORT, () => {
     console.log(`app is listening on port ${PORT}`);

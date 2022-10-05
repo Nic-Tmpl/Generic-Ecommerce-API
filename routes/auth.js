@@ -7,13 +7,13 @@ const db = require('../db');
 passport.use(new LocalStrategy((email, password, cb) => {
    db.query('SELECT * FROM users WHERE email = $1', [email], (err, row) => {
         if (err) {return cb(err); }
-        if (!row) {return cb(null, false, { message: 'Incorrect username or password.'}); }
+        if (!row) {return cb(null, false, { message: 'Incorrect email or password.'}); }
 
         //if a user is returned correctly
         crypto.pbkdf2(password, row.salt, 310000, 32, 'sha256', (err, hashedPassword) => {
             if (err) { return cb(err); }
             if (!crypto.timingSafeEqual(row.hashedPassword, hashedPassword)) {
-                return cb(null, false, { message: 'Incorrect username or password.'});
+                return cb(null, false, { message: 'Incorrect email or password.'});
             }
 
             return cb(null, row);
@@ -23,7 +23,7 @@ passport.use(new LocalStrategy((email, password, cb) => {
 
 passport.serializeUser((user, cb) => {
     process.nextTick(() => {
-        cb(null, { id: user.id, username: user.username });
+        cb(null, { id: user.id, email: user.email });
     });
 });
 
@@ -62,8 +62,8 @@ router.post('/signup', (req ,res, next) => {
     const salt = crypto.randomBytes(16);
     crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256', (err, hashedPassword) => {
         if (err) { return next(err); }
-        db.query('INSERT INTO users (username, password, salt) VALUES $1, $2, $3',
-        [req.body.username, hashedPassword, salt], (err) => {
+        db.query('INSERT INTO users (email, password, salt) VALUES $1, $2, $3',
+        [req.body.email, hashedPassword, salt], (err) => {
             if (err) { return next(err); }
             const user = {
                 id: this.lastID,
