@@ -37,7 +37,7 @@ CREATE TABLE "products" (
 );
 
 CREATE TABLE "cart" (
-  "id" int PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "user_id" int,
   "total" decimal,
   "created" timestamp,
