@@ -70,26 +70,15 @@ router.get('/signup', (req, res, next) => {
     res.render('signup');
 });
 
-router.post('/signup', async(req ,res) => {
+router.post('/signup', async(req, res) => {
         const { email, password } = req.body;
-        try {
         const { rows } = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
-        }
-        catch (e) {
-            return(e)
-        };
-        
+        console.log(rows[0]);
+        if (rows[0] === 'undefined') {
             const salt = await bcrypt.genSalt(10); //should be env variable?
             const hashedPassword =  await bcrypt.hash(password, salt);
-            const newUser = await db.query('INSERT INTO users (email, password) VALUES ($1, $2)',
-            [email, hashedPassword]);
-            if (newUser) {
-            res.status(201).json({
-                msg: "Succesfully Registered!"
-             })
-            res.redirect('/');                                        
-            }
-        } else {
-            res.redirect('/login');
-        }
-});
+            const newUser = await db.query('INSERT INTO users (email, password) VALUES ($1, $2)', [email, hashedPassword]);
+            res.send(newUser);
+        }  else {
+            res.send('User already Exists!');
+        }});
