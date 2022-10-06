@@ -1,7 +1,7 @@
 const Router = require('express-promise-router');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
-const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 const db = require('../db');
 
 passport.use(new LocalStrategy((email, password, cb) => {
@@ -58,21 +58,29 @@ router.get('/signup', (req, res, next) => {
     res.render('signup');
 });
 
-router.post('/signup', (req ,res, next) => {
-    const salt = crypto.randomBytes(16);
-    crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256', (err, hashedPassword) => {
-        if (err) { return next(err); }
-        db.query('INSERT INTO users (email, password, salt) VALUES $1, $2, $3',
-        [req.body.email, hashedPassword, salt], (err) => {
-            if (err) { return next(err); }
-            const user = {
-                id: this.lastID,
-                username: req.body.username
-            };
+router.post('/signup', async(req ,res) => {
+    //insert bcrypt here
+        const { email, password } = req.body;
+        const passwordHash = async (password, saltRounds) => {
+            try {
+                const salt = await bcrypt.genSalt(saltRounds);
+                return await bcrypt.hash(password, salt);
+            } catch (err) {
+                console.log(err);
+            }
+
+            return null;
+        };
+       const newUser = await db.query('INSERT INTO users (email, password, salt) VALUES ($1, $2, $3)',
+        [email, passwordHash], (err) => {
+            if (newUser) {
+                res.status(201).json({
+                    msg: "Succesfully Registered!"
+                })
+            }                                          
             req.login(user, (err) => {
                 if (err) { return next(err); }
                 res.redirect('/');
             });
         });
     });
-});
