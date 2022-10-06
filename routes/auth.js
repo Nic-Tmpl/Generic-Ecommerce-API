@@ -4,22 +4,34 @@ const LocalStrategy = require('passport-local');
 const bcrypt = require('bcrypt');
 const db = require('../db');
 
-passport.use(new LocalStrategy((email, password, cb) => {
-   db.query('SELECT * FROM users WHERE email = $1', [email], (err, row) => {
-        if (err) {return cb(err); }
-        if (!row) {return cb(null, false, { message: 'Incorrect email or password.'}); }
+const comparePasswords = async(password, hash) => {
+    try {
+        const matchFound = await bcrypt.compare(password, hash);
+        return matchFound;
+    } catch (err) {
+        console.log(err);
+    }
+    return false;
+};
 
-        //if a user is returned correctly
-        crypto.pbkdf2(password, row.salt, 310000, 32, 'sha256', (err, hashedPassword) => {
-            if (err) { return cb(err); }
-            if (!crypto.timingSafeEqual(row.hashedPassword, hashedPassword)) {
-                return cb(null, false, { message: 'Incorrect email or password.'});
+passport.use(new LocalStrategy(
+    async (email, password, done) => {
+    try {
+        const { rows } = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+            if(rows.email = null) {
+                return done(null, false, {message: `No user by that email`});
             }
-
-            return cb(null, row);
-        });
-    });
-}));
+    } catch (e) {
+        return done(e);
+    }
+    let match = await comparePasswords(password, rows.password);
+    if (!match) {
+        return done(null,false, {message: 'Not a matching password'});
+    }
+        
+    return done(null, row);
+    }
+));
 
 passport.serializeUser((user, cb) => {
     process.nextTick(() => {
@@ -43,7 +55,7 @@ router.get('/login', (req, res, next) => {
 });
 
 router.post('/login/password', passport.authenticate('local', {
-    succesRedirect: '/',
+    successRedirect: '/',
     failureRedirect: '/login'
 }));
 
@@ -59,28 +71,25 @@ router.get('/signup', (req, res, next) => {
 });
 
 router.post('/signup', async(req ,res) => {
-    //insert bcrypt here
         const { email, password } = req.body;
-        const passwordHash = async (password, saltRounds) => {
-            try {
-                const salt = await bcrypt.genSalt(saltRounds);
-                return await bcrypt.hash(password, salt);
-            } catch (err) {
-                console.log(err);
-            }
-
-            return null;
+        try {
+        const { rows } = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
+        }
+        catch (e) {
+            return(e)
         };
-       const newUser = await db.query('INSERT INTO users (email, password, salt) VALUES ($1, $2, $3)',
-        [email, passwordHash], (err) => {
+        
+            const salt = await bcrypt.genSalt(10); //should be env variable?
+            const hashedPassword =  await bcrypt.hash(password, salt);
+            const newUser = await db.query('INSERT INTO users (email, password) VALUES ($1, $2)',
+            [email, hashedPassword]);
             if (newUser) {
-                res.status(201).json({
-                    msg: "Succesfully Registered!"
-                })
-            }                                          
-            req.login(user, (err) => {
-                if (err) { return next(err); }
-                res.redirect('/');
-            });
-        });
-    });
+            res.status(201).json({
+                msg: "Succesfully Registered!"
+             })
+            res.redirect('/');                                        
+            }
+        } else {
+            res.redirect('/login');
+        }
+});
