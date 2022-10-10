@@ -18,13 +18,17 @@ router.get('/categories', async(req, res) => {
 
 router.get('/categories/:category', async(req, res) => {
     const { category } = req.params;
-    const { rows } = await db.query('SELECT c.id, c.name AS category, p.name FROM "categories" c JOIN "products" p ON c.id = p.category WHERE c.id = $1', [category]);
+    const { rows } = await db.query(`SELECT c.id, c.name AS category, p.name 
+                                    FROM "categories" c JOIN "products" p ON c.id = p.category 
+                                    WHERE c.id = $1`, [category]);
     res.send(rows);
 });
 
 router.get('/:id', async(req, res) => {
     const { id } = req.params;
-    const { rows } = await db.query('SELECT p.*, c.name AS category FROM "products" p JOIN "categories" c ON p.category = c.id WHERE p.id = $1', [id]);
+    const { rows } = await db.query(`SELECT p.*, c.name AS category 
+                                    FROM "products" p JOIN "categories" c ON p.category = c.id 
+                                    WHERE p.id = $1`, [id]);
     res.send(rows[0]);
 });
 
