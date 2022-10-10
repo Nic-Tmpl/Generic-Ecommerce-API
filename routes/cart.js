@@ -8,7 +8,7 @@ module.exports = router
 
 
 router.get('/', async (req, res) => {
-    const { user } = req.params;
+    const { user_id } = req.body;
     const { rows } = await db.query(`
         WITH temp_table AS (
             SELECT c.*, c_i.product_id, c_i.quantity
@@ -18,12 +18,12 @@ router.get('/', async (req, res) => {
         SELECT temp_table.*, products.name AS name FROM temp_table 
         JOIN products 
         ON temp_table.product_id = products.id
-        WHERE temp_table.user_id = $1`, [user])
+        WHERE temp_table.user_id = $1`, [user_id])
         res.send(rows);
 });
 
 router.post('/', async(req, res) => {
-    const user = req.body.user;
+    const user_id = req.body;
     const time = new Date().toISOString();
     const { rows } = await db.query(`INSERT INTO cart (user_id, created) VALUES ($1, $2)`, [user, time]);
     res.status(200);
