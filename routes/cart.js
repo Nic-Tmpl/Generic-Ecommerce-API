@@ -38,8 +38,19 @@ router.delete('/', async(req, res) => {
 });
 
 
-router.delete('/:id', async(req, res) => {
-    const { id } = req.params;
-    const { rows } = await db.query('DELETE FROM cart_item WHERE product_id = $1', [id]);
-    res.render('/');
+/* use cartId routes to allow changes to cart items table associated with a specific cartId */
+router.put('/:cartId', async(req, res) => {
+    const { cartId } = req.params;
+    const { product_id, quantity } = req.body;
+    const { rows } = await db.query(`INSERT INTO cart_item VALUES ($1, $2, $3)`,
+                                    [cartId, product_id, quantity]);
+    res.send(rows);
+});
+
+
+router.delete('/:cartId', async(req, res) => {
+    const { cartId } = req.params;
+    const { product_id } = req.body;
+    const { rows } = await db.query('DELETE FROM cart_item WHERE cart_id = $1 AND product_id = $2', [cartId, product_id]);
+    res.send(rows);
 });
