@@ -71,13 +71,15 @@ router.get('/signup', (req, res, next) => {
 });
 
 router.post('/signup', async(req, res) => {
-        const { email, password } = req.body;
+        const { email, password, first_name, last_name } = req.body;
         const { rows } = await db.query(`SELECT * FROM users WHERE email = $1`, [email]);
-        console.log(rows[0]);
         if (rows[0] === undefined) {
             const salt = await bcrypt.genSalt(10); //should be env variable?
             const hashedPassword =  await bcrypt.hash(password, salt);
-            const newUser = await db.query('INSERT INTO users (email, password) VALUES ($1, $2)', [email, hashedPassword]);
+            const time = new Date().toISOString();
+            const newUser = await db.query(`INSERT INTO users (email, password, first_name, last_name, created)
+                                             VALUES ($1, $2, $3, $4, $5)`,
+                            [email, hashedPassword, first_name, last_name, time]);
             res.send(newUser);
         }  else {
             res.send('User already Exists!');

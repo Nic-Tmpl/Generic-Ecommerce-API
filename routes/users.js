@@ -18,7 +18,6 @@ router.put('/:id', async(req, res) => {
     const { rows } = await db.query('SELECT * FROM users WHERE id = $1', [id]);
     const updatedProfile = Object.assign(rows[0], req.body);
     const time = new Date().toISOString();
-    console.log(updatedProfile);
     const update = await db.query(`UPDATE users SET 
                                     email = $1,
                                     first_name = $2,
@@ -27,4 +26,10 @@ router.put('/:id', async(req, res) => {
                                     WHERE id = $5`, 
             [updatedProfile.email, updatedProfile.first_name, updatedProfile.last_name, time, id]);
     res.send(update);
+})
+
+router.delete('/:id', async(req, res) => {
+    const { id } = req.params;
+    const { rows } = await db.query('DELETE FROM users WHERE id = $1', [id]);
+    res.send(rows);
 })
