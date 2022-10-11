@@ -41,16 +41,26 @@ router.delete('/', async(req, res) => {
 /* use cartId routes to allow changes to cart items table associated with a specific cartId */
 router.put('/:cartId', async(req, res) => {
     const { cartId } = req.params;
-    const { product_id, quantity } = req.body;
+    const { product_id, price, quantity } = req.body;
     const { rows } = await db.query(`INSERT INTO cart_item VALUES ($1, $2, $3)`,
                                     [cartId, product_id, quantity]);
-    res.send(rows);
+    //Logic for handling cart updates
+    const total = price * quantity;
+    const time = new Date().toISOString();
+    console.log(total);
+    const insert = await db.query(`INSERT INTO cart (total, modified) VALUES ($1, $2) WHERE cart_id = $3`, [total, time, cartId]);
+    res.send(insert);
 });
 
 
 router.delete('/:cartId', async(req, res) => {
     const { cartId } = req.params;
-    const { product_id } = req.body;
+    const { product_id, price, quantity } = req.body;
     const { rows } = await db.query('DELETE FROM cart_item WHERE cart_id = $1 AND product_id = $2', [cartId, product_id]);
+
+    //Logic for cart updates
+    const total = price * quantity;
+    const time = new Date().toISOString();
+    const insert = await db.query(`INSERT INTO cart (total, modified) VALUES ($1, $2) WHERE cart_id = $3`, [total, time, cartId]);
     res.send(rows);
 });
