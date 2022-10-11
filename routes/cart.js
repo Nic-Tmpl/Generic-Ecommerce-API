@@ -38,6 +38,20 @@ router.delete('/', async(req, res) => {
 });
 
 
+router.post('/:cartId/checkout', async(req, res) => {
+    const { cartId } = req.params;
+    const checkout = true;
+    if (checkout) {
+        const { rows } = await db.query(`INSERT INTO order(user_id, total) SELECT (user_id, total) FROM cart WHERE id = $1;
+                                        INSERT INTO order_item(cart_id, product_id, quantity) 
+                                        SELECT (cart_id, product_id, quantity)
+                                        FROM cart_item WHERE cart_id = $1`, [cartId]);
+    res.send(rows[0]);
+    }
+   
+})
+
+
 /* use cartId routes to allow changes to cart items table associated with a specific cartId */
 router.put('/:cartId', async(req, res) => {
     const { cartId } = req.params;
@@ -68,3 +82,4 @@ router.delete('/:cartId', async(req, res) => {
                                     WHERE id = $3`, [total, time, cartId]);
     res.send(rows);
 });
+
