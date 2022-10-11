@@ -48,7 +48,9 @@ router.put('/:cartId', async(req, res) => {
     const total = price * quantity;
     const time = new Date().toISOString();
     console.log(total);
-    const insert = await db.query(`INSERT INTO cart (total, modified) VALUES ($1, $2) WHERE cart_id = $3`, [total, time, cartId]);
+    const insert = await db.query(`UPDATE cart 
+                                 SET total = total + $1, modified = $2
+                                 WHERE cart_id = $3`, [total, time, cartId]);
     res.send(insert);
 });
 
@@ -61,6 +63,8 @@ router.delete('/:cartId', async(req, res) => {
     //Logic for cart updates
     const total = price * quantity;
     const time = new Date().toISOString();
-    const insert = await db.query(`INSERT INTO cart (total, modified) VALUES ($1, $2) WHERE cart_id = $3`, [total, time, cartId]);
+    const insert = await db.query(`UPDATE cart 
+                                    SET total = total - $1, modified = $2
+                                    WHERE cart_id = $3`, [total, time, cartId]);
     res.send(rows);
 });
