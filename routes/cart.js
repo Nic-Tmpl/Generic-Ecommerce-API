@@ -23,16 +23,16 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async(req, res) => {
-    const user_id = req.body;
+    const { user_id } = req.body;
     const time = new Date().toISOString();
-    const { rows } = await db.query(`INSERT INTO cart (user_id, created) VALUES ($1, $2)`, [user, time]);
+    const { rows } = await db.query(`INSERT INTO cart (user_id, created) VALUES ($1, $2)`, [user_id, time]);
     res.status(200);
     res.send(rows);
 });
 
 router.delete('/', async(req, res) => {
-    const user = req.body.user;
-    const { rows } = await db.query(`DELETE FROM cart WHERE user_id = $1`, [user]);
+    const { user_id } = req.body;
+    const { rows } = await db.query(`DELETE FROM cart WHERE user_id = $1`, [user_id]);
     res.status(200);
     res.send('Cart Removed.');
 });
@@ -50,7 +50,7 @@ router.put('/:cartId', async(req, res) => {
     console.log(total);
     const insert = await db.query(`UPDATE cart 
                                  SET total = total + $1, modified = $2
-                                 WHERE cart_id = $3`, [total, time, cartId]);
+                                 WHERE id = $3`, [total, time, cartId]);
     res.send(insert);
 });
 
@@ -65,6 +65,6 @@ router.delete('/:cartId', async(req, res) => {
     const time = new Date().toISOString();
     const insert = await db.query(`UPDATE cart 
                                     SET total = total - $1, modified = $2
-                                    WHERE cart_id = $3`, [total, time, cartId]);
+                                    WHERE id = $3`, [total, time, cartId]);
     res.send(rows);
 });
