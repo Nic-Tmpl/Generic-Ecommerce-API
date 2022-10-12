@@ -8,8 +8,8 @@ CREATE TABLE "users" (
   "modified" timestamp
 );
 
-CREATE TABLE "order" (
-  "id" int UNIQUE PRIMARY KEY,
+CREATE TABLE "orders" (
+  "id" SERIAL PRIMARY KEY,
   "user_id" int,
   "status" varchar,
   "total" decimal,
@@ -39,7 +39,7 @@ CREATE TABLE "products" (
 CREATE TABLE "cart" (
   "id" SERIAL PRIMARY KEY,
   "user_id" int,
-  "total" decimal,
+  "total" decimal NOT NULL,
   "created" timestamp,
   "modified" timestamp
 );
@@ -50,7 +50,7 @@ CREATE TABLE "cart_item" (
   "quantity" int
 );
 
-ALTER TABLE "order" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+ALTER TABLE "orders" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "order_item" ADD FOREIGN KEY ("order_id") REFERENCES "order" ("id");
 
@@ -60,6 +60,6 @@ ALTER TABLE "products" ADD FOREIGN KEY ("category") REFERENCES "categories" ("id
 
 ALTER TABLE "cart" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
-ALTER TABLE "cart_item" ADD FOREIGN KEY ("cart_id") REFERENCES "cart" ("id");
+ALTER TABLE "cart_item" ADD FOREIGN KEY ("cart_id") REFERENCES "cart" ("id") ON DELETE CASCADE;
 
 ALTER TABLE "cart_item" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");

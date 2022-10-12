@@ -40,16 +40,25 @@ router.delete('/', async(req, res) => {
 
 router.post('/:cartId/checkout', async(req, res) => {
     const { cartId } = req.params;
+    //for now checkout is always true
     const checkout = true;
     if (checkout) {
-        const { rows } = await db.query(`INSERT INTO order(user_id, total) SELECT (user_id, total) FROM cart WHERE id = $1;
-                                        INSERT INTO order_item(cart_id, product_id, quantity) 
-                                        SELECT (cart_id, product_id, quantity)
-                                        FROM cart_item WHERE cart_id = $1`, [cartId]);
+        const { rows } = await db.query(`INSERT INTO orders (user_id, total) SELECT cart.user_id, cart.total
+                                        FROM cart WHERE cart.id = $1
+                                        RETURNING *`, [cartId]);
+
+        //Move items from cart_item to order_item with correct order id
+        const { id } = rows[0];
+        const update = await db.query(`INSERT INTO order_item (order_id, product_id, quantity)
+                                        SELECT o.id, c_i.product_id, c_i.quantity
+                                        FROM orders o, cart_item c_i
+                                        WHERE o.id = $1 AND c_i.cart_id = $2`, [id, cartId]);
+        
+        //clears Cart and cart_item tables
+        const clear = await db.query(`DELETE FROM cart WHERE cart.id = $1`, [cartId]);
     res.send(rows[0]);
-    }
-   
-})
+    }  
+});
 
 
 /* use cartId routes to allow changes to cart items table associated with a specific cartId */
