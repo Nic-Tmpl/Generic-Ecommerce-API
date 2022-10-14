@@ -66,7 +66,7 @@ router.put('/:cartId', async(req, res) => {
     const { cartId } = req.params;
     const { product_id, price, quantity } = req.body;
     const { rows } = await db.query(`INSERT INTO cart_item VALUES ($1, $2, $3)`,
-                                    [cartId, product_id, quantity]);
+                                    [product_id, quantity, cartId]);
     //Logic for handling cart updates
     const total = price * quantity;
     const time = new Date().toISOString();

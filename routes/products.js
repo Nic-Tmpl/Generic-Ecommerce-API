@@ -7,7 +7,7 @@ const router = new Router();
 module.exports = router;
 
 router.get('/', async(req, res) => {
-    const { rows } = await db.query('SELECT name, category FROM products');
+    const { rows } = await db.query('SELECT * FROM products');
     res.send(rows);
 });
 
