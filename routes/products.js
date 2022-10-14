@@ -32,9 +32,3 @@ router.get('/:id', async(req, res) => {
     res.send(rows[0]);
 });
 
-router.put('/:id', async(req, res) => {
-    const { id } = req.params;
-    const { rows } = await db.query('INSERT INTO cart_item (product_id) VALUES $1', [id]);
-    res.render('/');
-});
-
