@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
     const { user_id } = req.body;
     const { rows } = await db.query(`
         WITH temp_table AS (
-            SELECT c.*, c_i.product_id, c_i.quantity
+            SELECT c.*, c_i.*
             FROM "cart" c JOIN "cart_item" c_i ON c_i.cart_id = c.id
             )
 
@@ -65,30 +65,29 @@ router.post('/:cartId/checkout', async(req, res) => {
 router.put('/:cartId', async(req, res) => {
     const { cartId } = req.params;
     const { product_id, price, quantity } = req.body;
-    const { rows } = await db.query(`INSERT INTO cart_item VALUES ($1, $2, $3)`,
+    const insert = await db.query(`INSERT INTO cart_item VALUES ($1, $2, $3)`,
                                     [product_id, quantity, cartId]);
     //Logic for handling cart updates
     const total = price * quantity;
     const time = new Date().toISOString();
-    console.log(total);
-    const insert = await db.query(`UPDATE cart 
+    const { rows } = await db.query(`UPDATE cart 
                                  SET total = total + $1, modified = $2
-                                 WHERE id = $3`, [total, time, cartId]);
-    res.send(insert);
+                                 WHERE id = $3 RETURNING *`, [total, time, cartId]);
+    res.send(rows);
 });
 
 
 router.delete('/:cartId', async(req, res) => {
     const { cartId } = req.params;
     const { product_id, price, quantity } = req.body;
-    const { rows } = await db.query('DELETE FROM cart_item WHERE cart_id = $1 AND product_id = $2', [cartId, product_id]);
+    const insert = await db.query('DELETE FROM cart_item WHERE cart_id = $1 AND product_id = $2', [cartId, product_id]);
 
     //Logic for cart updates
     const total = price * quantity;
     const time = new Date().toISOString();
-    const insert = await db.query(`UPDATE cart 
+    const { rows } = await db.query(`UPDATE cart 
                                     SET total = total - $1, modified = $2
-                                    WHERE id = $3`, [total, time, cartId]);
+                                    WHERE id = $3 RETURNING *`, [total, time, cartId]);
     res.send(rows);
 });
 
