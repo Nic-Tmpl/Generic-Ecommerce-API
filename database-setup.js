@@ -17,9 +17,12 @@ const { DB } = require('./config');
     CREATE TABLE IF NOT EXISTS products (
       id              UUID DEFAULT gen_random_uuid()  PRIMARY KEY NOT NULL,
       name            VARCHAR       NOT NULL,
+      image           VARCHAR,       
       description     VARCHAR       NOT NULL,
       category        INT,
       price           DECIMAL       NOT NULL,
+      rating          DECIMAL,
+      numReviews      INT, 
       FOREIGN KEY (category) REFERENCES category(id)
     );
   `
