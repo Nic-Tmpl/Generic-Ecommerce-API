@@ -5,7 +5,7 @@ const { DB } = require('./config');
 
   const usersTableStmt = `
     CREATE TABLE IF NOT EXISTS users (
-      id              SERIAL               PRIMARY KEY NOT NULL,
+      id              UUID             PRIMARY KEY NOT NULL,
       password        VARCHAR,
       email           VARCHAR(50),      
       first_name      VARCHAR(50),
@@ -15,7 +15,7 @@ const { DB } = require('./config');
 
   const productsTableStmt = `
     CREATE TABLE IF NOT EXISTS products (
-      id              INT           PRIMARY KEY NOT NULL,
+      id              UUID          PRIMARY KEY NOT NULL,
       name            VARCHAR       NOT NULL,
       description     VARCHAR       NOT NULL,
       category        INT,
